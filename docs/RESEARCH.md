@@ -1,6 +1,6 @@
-# Coca-Cola-Inspired Concept Poster & Single-Page HTML Experience — Visual Direction Plan
+# Coca-Cola-Inspired Concept Poster & Single-Page HTML Experience - Research Plan
 
-**Research-only deliverable.** No code, images, or fonts were copied from Coca-Cola or third-party sites. All implementation requires the captain's later selection.
+**Archived planning research.** Direction A, Heritage Poster, was accepted with original CSS/SVG artwork and restrained scroll reveals plus subtle parallax. No code, images, or fonts were copied from Coca-Cola or third-party sites. See the [README](../README.md) for the current user-facing design, usage, and testing contract.
 
 ---
 
@@ -130,7 +130,7 @@ The following guardrails will apply to any implementation:
 
 ---
 
-## 6. Recommended direction: Heritage Poster (Swiss/Print Editorial)
+## 6. Accepted direction: Heritage Poster (Swiss/Print Editorial)
 
 **Evidence:**
 - Coca-Cola's own 2026 refresh is explicitly about making the brand "unmistakably Coca-Cola" through **clarity and consistency** rather than through more effects (source: Coca-Cola Company media center). A poster that is bold, red, white, and typographically confident delivers that consistency better than a motion-heavy experience.
@@ -147,7 +147,7 @@ The following guardrails will apply to any implementation:
 
 ---
 
-## 7. Concrete implementation plan (for the recommended Heritage Poster direction)
+## 7. Accepted implementation plan
 
 ### 7.1 Information hierarchy
 
@@ -241,15 +241,15 @@ The following guardrails will apply to any implementation:
 
 ---
 
-## 8. Unresolved captain decisions
+## 8. Accepted decisions
 
-The implementation plan exposes the following decisions that belong to the captain. These have been registered through the decision-hold lifecycle so they survive teardown.
+The implementation proceeded with these accepted choices:
 
-1. **Creative direction selection** — Which of the three directions (Heritage Poster, Dynamic Ribbon, Brutalist Pop) should be implemented?
-2. **Asset sourcing** — Should the bottle silhouette and any decorative graphics be supplied by the user, generated as original SVG/Canvas by the implementer, or sourced from clearly licensed stock?
-3. **Motion ambition** — Should the deliverable include the recommended scroll/parallax motion, or default to a static poster-first experience with only hover/focus micro-interactions?
+1. **Creative direction:** Direction A, Heritage Poster (Swiss/Print Editorial).
+2. **Asset sourcing:** Original CSS and SVG artwork only.
+3. **Motion ambition:** Restrained scroll reveals and subtle parallax, with static mobile and `prefers-reduced-motion` fallbacks.
 
-A private Lavish review artifact has been created at `/Users/cyril/code/firstmate/data/coca-cola-poster-research/visual-direction-plan.html` and is open for review at **http://127.0.0.1:4387/session/cdf81e6981de8e0b** with structured controls for the captain to compare the three directions and submit a preference. A self-contained exported copy is also saved as `visual-direction-plan-export.html` in the same directory and can be opened directly without the Lavish server.
+The [README](../README.md) owns the implemented product contract. This document preserves the research, comparison, information hierarchy, accessibility requirements, and performance budgets that informed that choice.
 
 ---
 
@@ -273,19 +273,12 @@ fetch_content https://tympanus.net/codrops/2023/01/18/on-scroll-typography-anima
 fetch_content https://qodeinteractive.com/magazine/websites-inspired-by-poster-aesthetics/
 ```
 
-### Files created
+### Research artifact
 
-- `/Users/cyril/code/firstmate/data/coca-cola-poster-research/report.md` (this report)
-- `/Users/cyril/code/firstmate/data/coca-cola-poster-research/visual-direction-plan.html` (Lavish review artifact)
-
-### Decision-hold lifecycle
-
-- Origin ID: `coca-cola-poster-research`
-- Decision keys registered: `creative-direction`, `asset-sourcing`, `motion-ambition`
-- Completion gate: `fm-decision-hold.sh complete coca-cola-poster-research creative-direction asset-sourcing motion-ambition`
+- [`docs/RESEARCH.md`](RESEARCH.md) (this archived research plan)
 
 ---
 
-## 10. Recommendation summary
+## 10. Accepted direction summary
 
-**Implement Direction A — Heritage Poster (Swiss/Print Editorial).** It is the only option that is equally strong as a static poster and as a single-page HTML experience, it aligns with Coca-Cola's own 2026 emphasis on consistency and clarity, and it carries the lowest accessibility/performance risk while still allowing elegant, original scroll-driven motion. The two alternatives (Dynamic Ribbon and Brutalist Pop) are viable but higher-risk and should only be selected if the captain explicitly prioritizes kinetic energy or raw collage energy over poster clarity.
+**Direction A, Heritage Poster (Swiss/Print Editorial), was accepted.** It is the only option that is equally strong as a static poster and as a single-page HTML experience, it aligns with Coca-Cola's own 2026 emphasis on consistency and clarity, and it carries the lowest accessibility/performance risk while still allowing elegant, original scroll-driven motion. The Dynamic Ribbon and Brutalist Pop alternatives remain research context rather than implementation options.
