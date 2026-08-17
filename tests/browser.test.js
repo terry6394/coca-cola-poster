@@ -358,6 +358,9 @@ describe('Rendered semantic structure', () => {
     assert.match(visibleContent.disclaimer, /non-commercial/i);
     assert.match(visibleContent.disclaimer, /unofficial/i);
     assert.match(visibleContent.disclaimer, /not affiliated/i);
+    assert.match(visibleContent.disclaimer, /historical reference/i);
+    assert.match(visibleContent.disclaimer, /brand artwork/i);
+    assert.doesNotMatch(visibleContent.disclaimer, /no official coca-cola logos, trademarks/i);
     assert.ok(visibleContent.sourceLinks.length >= 3);
     assert.equal(visibleContent.prohibitedMediaCount, 0);
   });
