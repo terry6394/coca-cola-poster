@@ -361,7 +361,7 @@ body {
 }
 
 /* Responsive: tablet */
-@media (max-width: 1023px) {
+@media screen and (max-width: 1023px) {
   .poster-canvas {
     width: 100%;
     aspect-ratio: auto;
@@ -418,7 +418,7 @@ body {
 }
 
 /* Responsive: mobile */
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
   .poster-stage {
     padding: 1rem;
   }

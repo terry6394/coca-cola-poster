@@ -664,17 +664,25 @@ describe('Motion preferences and print output', () => {
   });
 
   it('prints exactly one A2 poster page without supporting sections', async () => {
+    await page.viewport(375, 667);
     await page.send('Emulation.setEmulatedMedia', { media: 'print' });
     await page.goto(app.url);
     const printLayout = await page.evaluate(`(() => {
       const poster = document.querySelector('.poster-canvas').getBoundingClientRect();
+      const disc = document.querySelector('.red-disc').getBoundingClientRect();
       return {
+        canvasDisplay: getComputedStyle(document.querySelector('.poster-canvas')).display,
         contextDisplay: getComputedStyle(document.querySelector('.context-panel')).display,
+        discWidthRatio: disc.width / poster.width,
+        factRailDisplay: getComputedStyle(document.querySelector('.fact-rail')).display,
         footerDisplay: getComputedStyle(document.querySelector('.site-footer')).display,
         posterVisible: poster.width > 0 && poster.height > 0,
       };
     })()`);
+    assert.equal(printLayout.canvasDisplay, 'grid', 'print should use the poster grid instead of the mobile stack');
     assert.equal(printLayout.contextDisplay, 'none');
+    assert.ok(printLayout.discWidthRatio >= 0.3, 'print should preserve the large editorial red disc');
+    assert.equal(printLayout.factRailDisplay, 'flex', 'print should preserve the single-row fact rail');
     assert.equal(printLayout.footerDisplay, 'none');
     assert.equal(printLayout.posterVisible, true);
 
