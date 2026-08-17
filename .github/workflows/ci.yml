@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, fm/coca-cola-poster-research]
+    branches: [main]
   pull_request:
     branches: [main]
 
