@@ -9,9 +9,10 @@ An independent, non-commercial concept poster and responsive single-page HTML ex
 - **Palette:** classic red (`#F40009`), warm white (`#FFF8F0`), near-black (`#0A0A0A`). Georgia Green (`#3A4A3A`) is used only as a small historical accent.
 - **Typography:** Playfair Display for display type, Inter for body text. Both are loaded from Google Fonts (OFL).
 - **Artwork:** original CSS/SVG created for this concept. No official Coca-Cola wordmark, contour bottle, Dynamic Ribbon, campaign photography, or proprietary fonts are used.
-- **Motion:** restrained scroll reveals and subtle parallax. A complete static fallback is active when `prefers-reduced-motion` is set.
+- **Motion:** restrained scroll reveals and subtle parallax. A complete static fallback is active when `prefers-reduced-motion` is set. The experience uses no Canvas, WebGL, autoplay, continuous animation, or audio.
 - **Accessibility:** semantic HTML, skip link, focus-visible styles, `aria-label` on the bottle SVG, and WCAG 2.1 AA contrast targets.
-- **Disclaimer:** a visible independent, non-commercial, unofficial concept disclaimer is included in the footer.
+- **Print:** print styles produce one clean, portrait A2 poster page and omit the supporting web content.
+- **Disclaimer and credits:** a visible independent, non-commercial, unofficial concept disclaimer and source links are included in the footer.
 
 ## Local development
 
@@ -28,6 +29,8 @@ npx serve .
 ```
 
 ## Testing
+
+The rendered-page tests require Node.js 22 or later and an installed Chrome or Chromium browser.
 
 ```bash
 npm install

@@ -67,10 +67,10 @@ Each reference is listed with its URL, what it does well, and the **abstract pri
 
 ## 4. Copyright, trademark, and asset boundaries
 
-The following guardrails will apply to any implementation:
+The following research-stage guardrails framed all three alternatives. The accepted choices in section 8 narrow the asset and motion boundaries for the implemented direction.
 
 1. **No reproduction of official Coca-Cola assets.** Do not use the official Spencerian script logotype, the contour-bottle trademarked silhouette, campaign photography, or the Dynamic Ribbon as a literal copy. Instead, create **original SVG shapes** that evoke the contour bottle's proportions (a generic curvy bottle shape), hand-lettered or original script lettering, and a red-disc motif that is a common geometric element.
-2. **Visible non-commercial / unofficial disclaimer.** The page must include a persistent footer: *“This is an independent, non-commercial concept study inspired by Coca-Cola history and design principles. It is not affiliated with, endorsed by, or sponsored by The Coca-Cola Company.”*
+2. **Visible non-commercial / unofficial disclaimer.** The [README](../README.md) owns the current wording and placement contract; the rendered footer owns the public-facing notice.
 3. **Typefaces.** Use open-source or clearly licensed fonts only. Candidates:
    - **Playfair Display** (Google Fonts) for an elegant, high-contrast editorial headline.
    - **Inter / Manrope / Satoshi** for clean, modern body copy.
@@ -147,7 +147,9 @@ The following guardrails will apply to any implementation:
 
 ---
 
-## 7. Accepted implementation plan
+## 7. Accepted planning blueprint
+
+The targets below preserve the accepted information hierarchy, accessibility requirements, and performance budgets. They are planning constraints rather than a synchronized inventory of implementation details; the [README](../README.md) owns the current product and usage contract.
 
 ### 7.1 Information hierarchy
 
@@ -199,7 +201,7 @@ The following guardrails will apply to any implementation:
 - **First Contentful Paint:** ≤1.2s on 4G.
 - **Largest Contentful Paint:** ≤1.8s on 4G.
 - **Animation frame budget:** 60 fps; only `transform` and `opacity` animated.
-- **No external images** except self-hosted fonts.
+- **No external images.** Open-licensed fonts may load from Google Fonts, with local system fallbacks.
 
 ### 7.7 Reduced-motion fallback
 
