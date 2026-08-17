@@ -89,6 +89,14 @@ function findChrome() {
   return executable;
 }
 
+async function stopProcess(processHandle) {
+  if (processHandle.exitCode !== null) return;
+  const exited = new Promise((resolve) => processHandle.once('exit', resolve));
+  processHandle.kill('SIGTERM');
+  await Promise.race([exited, new Promise((resolve) => setTimeout(resolve, 3000))]);
+  if (processHandle.exitCode === null) processHandle.kill('SIGKILL');
+}
+
 async function launchChrome() {
   const profileDir = fs.mkdtempSync(path.join(os.tmpdir(), 'heritage-poster-chrome-'));
   const processHandle = spawn(findChrome(), [
@@ -106,19 +114,23 @@ async function launchChrome() {
     'about:blank',
   ], { stdio: 'ignore' });
   const portFile = path.join(profileDir, 'DevToolsActivePort');
-  const port = await waitFor(() => {
-    if (processHandle.exitCode !== null) throw new Error(`Chrome exited with code ${processHandle.exitCode}`);
-    if (!fs.existsSync(portFile)) return undefined;
-    return Number(fs.readFileSync(portFile, 'utf8').split('\n')[0]);
-  });
+  let port;
+  try {
+    port = await waitFor(() => {
+      if (processHandle.exitCode !== null) throw new Error(`Chrome exited with code ${processHandle.exitCode}`);
+      if (!fs.existsSync(portFile)) return undefined;
+      return Number(fs.readFileSync(portFile, 'utf8').split('\n')[0]);
+    }, 30000);
+  } catch (error) {
+    await stopProcess(processHandle);
+    fs.rmSync(profileDir, { force: true, recursive: true });
+    throw error;
+  }
 
   return {
     port,
     stop: async () => {
-      if (processHandle.exitCode === null) {
-        processHandle.kill('SIGTERM');
-        await new Promise((resolve) => processHandle.once('exit', resolve));
-      }
+      await stopProcess(processHandle);
       fs.rmSync(profileDir, { force: true, recursive: true });
     },
   };
@@ -373,6 +385,27 @@ describe('Rendered semantic structure', () => {
     assert.equal(destination.hash, '#main-content');
     assert.equal(destination.id, 'main-content');
   });
+
+  it('keeps the primary headline visible when enhancement fails', async () => {
+    await page.send('Network.setBlockedURLs', { urls: ['*/js/main.js'] });
+    await page.goto(app.url);
+    const headline = await page.evaluate(`(() => {
+      const line = document.querySelector('.reveal-line');
+      const rect = line.getBoundingClientRect();
+      const style = getComputedStyle(line);
+      return {
+        height: rect.height,
+        opacity: style.opacity,
+        transform: style.transform,
+        width: rect.width,
+      };
+    })()`);
+    assert.equal(headline.opacity, '1');
+    assert.equal(headline.transform, 'none');
+    assert.ok(headline.width > 0 && headline.height > 0);
+    await page.send('Network.setBlockedURLs', { urls: [] });
+    await page.goto(app.url);
+  });
 });
 
 describe('Loaded asset provenance', () => {
@@ -409,19 +442,34 @@ describe('Responsive layout and rendered contrast', () => {
       await page.viewport(width, height);
       await page.motion('no-preference');
       await page.goto(app.url);
-      await page.wait();
+      await page.wait(850);
       const layout = await page.evaluate(`(() => {
         const canvas = document.querySelector('.poster-canvas').getBoundingClientRect();
         const selectors = ['.poster-meta', '.poster-headline', '.poster-subhead', '.bottle-silhouette', '.fact-rail'];
         const children = selectors.map((selector) => {
           const rect = document.querySelector(selector).getBoundingClientRect();
-          return { selector, left: rect.left, right: rect.right };
+          return { selector, bottom: rect.bottom, left: rect.left, right: rect.right, top: rect.top };
         });
+        const ink = [...document.querySelectorAll('.reveal-line')].map((line) => {
+          const range = document.createRange();
+          range.selectNodeContents(line);
+          const rect = range.getBoundingClientRect();
+          return { bottom: rect.bottom, left: rect.left, right: rect.right, text: line.textContent, top: rect.top };
+        });
+        const rectFor = (selector) => {
+          const rect = document.querySelector(selector).getBoundingClientRect();
+          return { bottom: rect.bottom, left: rect.left, right: rect.right, top: rect.top };
+        };
         return {
-          canvas: { left: canvas.left, right: canvas.right, ratio: canvas.height / canvas.width },
+          bottle: rectFor('.bottle-silhouette'),
+          canvas: { bottom: canvas.bottom, left: canvas.left, right: canvas.right, top: canvas.top, ratio: canvas.height / canvas.width },
           children,
+          ink,
           innerWidth,
+          rail: rectFor('.fact-rail'),
+          meta: rectFor('.poster-meta'),
           scrollWidth: document.documentElement.scrollWidth,
+          subhead: rectFor('.poster-subhead'),
         };
       })()`);
 
@@ -431,6 +479,23 @@ describe('Responsive layout and rendered contrast', () => {
       layout.children.forEach((child) => {
         assert.ok(child.left >= layout.canvas.left - 1, `${child.selector} clips on the left at ${name}`);
         assert.ok(child.right <= layout.canvas.right + 1, `${child.selector} clips on the right at ${name}`);
+        assert.ok(child.top >= layout.canvas.top - 1, `${child.selector} clips above the canvas at ${name}`);
+        assert.ok(child.bottom <= layout.canvas.bottom + 1, `${child.selector} clips below the canvas at ${name}`);
+      });
+      layout.ink.forEach((line) => {
+        assert.ok(line.left >= layout.canvas.left - 1, `${line.text} ink clips on the left at ${name}`);
+        assert.ok(line.right <= layout.canvas.right + 1, `${line.text} ink clips on the right at ${name}`);
+        assert.ok(line.top >= layout.canvas.top - 1, `${line.text} ink clips above the canvas at ${name}`);
+        assert.ok(line.bottom <= layout.canvas.bottom + 1, `${line.text} ink clips below the canvas at ${name}`);
+      });
+      const overlapArea = (first, second) => Math.max(0, Math.min(first.right, second.right) - Math.max(first.left, second.left))
+        * Math.max(0, Math.min(first.bottom, second.bottom) - Math.max(first.top, second.top));
+      assert.equal(overlapArea(layout.bottle, layout.meta), 0, `bottle covers poster metadata at ${name}`);
+      assert.equal(overlapArea(layout.bottle, layout.subhead), 0, `bottle covers poster subhead at ${name}`);
+      assert.equal(overlapArea(layout.bottle, layout.rail), 0, `bottle covers fact rail at ${name}`);
+      assert.equal(overlapArea(layout.subhead, layout.rail), 0, `subhead covers fact rail at ${name}`);
+      layout.ink.forEach((line) => {
+        assert.equal(overlapArea(layout.bottle, line), 0, `bottle covers ${line.text} at ${name}`);
       });
       if (name === 'desktop' || name === 'laptop') {
         assert.ok(Math.abs(layout.canvas.ratio - Math.SQRT2) < 0.01, `${name} poster is not A-series ratio`);
@@ -512,6 +577,29 @@ describe('Responsive layout and rendered contrast', () => {
 });
 
 describe('Motion preferences and print output', () => {
+  it('keeps mobile reveals static without a transition', async () => {
+    await page.viewport(375, 667);
+    await page.motion('no-preference');
+    await page.goto(app.url);
+    const mobileMotion = await page.evaluate(`(() => {
+      const selectors = ['.reveal-line', '.scroll-reveal'];
+      return selectors.map((selector) => {
+        const style = getComputedStyle(document.querySelector(selector));
+        return {
+          opacity: style.opacity,
+          selector,
+          transform: style.transform,
+          transitionDuration: style.transitionDuration,
+        };
+      });
+    })()`);
+    mobileMotion.forEach((state) => {
+      assert.equal(state.opacity, '1', `${state.selector} should be immediately visible on mobile`);
+      assert.equal(state.transform, 'none', `${state.selector} should not translate on mobile`);
+      assert.equal(state.transitionDuration, '0s', `${state.selector} should not transition on mobile`);
+    });
+  });
+
   it('reveals scrolled content and responds to reduced motion changes', async () => {
     await page.viewport(1440, 900);
     await page.motion('no-preference');
@@ -530,9 +618,13 @@ describe('Motion preferences and print output', () => {
     await page.motion('reduce');
     await page.waitUntil(`(() => {
       const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const bottle = document.querySelector('.bottle-silhouette').style.transform;
-      const disc = document.querySelector('.red-disc').style.transform;
-      return reduced && bottle === '' && disc === '';
+      const bottle = document.querySelector('.bottle-silhouette');
+      const disc = document.querySelector('.red-disc');
+      return reduced
+        && bottle.style.transform === ''
+        && disc.style.transform === ''
+        && getComputedStyle(bottle).transform === 'none'
+        && getComputedStyle(disc).transform === 'none';
     })()`);
     const reduced = await page.evaluate(`({
       allRevealed: [...document.querySelectorAll('.reveal-line, .scroll-reveal')].every((element) => element.classList.contains('is-visible')),
