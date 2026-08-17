@@ -1,0 +1,13 @@
+{
+  "name": "coca-cola-poster",
+  "version": "0.1.0",
+  "description": "Independent Heritage Poster concept inspired by Coca-Cola history",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/browser.test.js",
+    "start": "python3 -m http.server 8000"
+  },
+  "devDependencies": {},
+  "keywords": ["poster", "concept", "static-site"],
+  "license": "MIT"
+}

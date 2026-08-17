@@ -1,0 +1,585 @@
+/* Heritage Poster — Coca-Cola Inspired Concept */
+
+:root {
+  --coke-red: #F40009;
+  --coke-red-dark: #C00007;
+  --warm-white: #FFF8F0;
+  --near-black: #0A0A0A;
+  --georgia-green: #3A4A3A;
+  --gray-mid: #6E6E6E;
+
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --max-poster-width: 1400px;
+  --poster-padding: clamp(1.5rem, 4vh, 4rem);
+  --a2-ratio: 1.4142135624;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background-color: var(--warm-white);
+  color: var(--near-black);
+  line-height: 1.55;
+}
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: var(--near-black);
+  color: var(--warm-white);
+  padding: 0.5rem 1rem;
+  text-decoration: underline;
+  z-index: 100;
+  transform: translateY(calc(-100% - 2px));
+  transition: transform 0.2s;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* Poster stage */
+.poster-stage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--poster-padding);
+  position: relative;
+}
+
+.poster-canvas {
+  --poster-gutter: clamp(1.5rem, 4vh, 3rem);
+  position: relative;
+  width: min(100%, calc((100vh - 2 * var(--poster-padding)) / var(--a2-ratio)));
+  max-width: var(--max-poster-width);
+  aspect-ratio: 1 / var(--a2-ratio);
+  container-type: inline-size;
+  background-color: var(--warm-white);
+  border: 2px solid var(--near-black);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr auto auto;
+  grid-template-areas:
+    "meta meta"
+    "headline headline"
+    "subhead bottle"
+    "rail rail";
+  padding: var(--poster-gutter);
+  overflow: hidden;
+}
+
+.poster-canvas > * {
+  min-width: 0;
+}
+
+.red-disc {
+  position: absolute;
+  width: clamp(180px, 82cqw, 560px);
+  height: clamp(180px, 82cqw, 560px);
+  background-color: var(--coke-red);
+  border-radius: 50%;
+  top: 8%;
+  left: -8%;
+  z-index: 0;
+  will-change: transform;
+}
+
+.poster-meta {
+  grid-area: meta;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.location-badge {
+  font-family: var(--font-body);
+  font-size: clamp(0.65rem, 1.2vw, 0.8rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.7rem;
+  border: 1.5px solid var(--near-black);
+}
+
+.year-badge {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 11cqw, 5.5rem);
+  font-weight: 900;
+  line-height: 0.82;
+  letter-spacing: -0.04em;
+  color: var(--near-black);
+}
+
+.year-prefix {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--georgia-green);
+  padding: 0.15rem 0.25rem;
+  background-color: var(--warm-white);
+}
+
+.poster-headline {
+  grid-area: headline;
+  position: relative;
+  z-index: 1;
+  align-self: center;
+  font-family: var(--font-display);
+  width: 100%;
+  font-size: clamp(3rem, 10.5cqw, 6rem);
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  margin: 0;
+  color: var(--near-black);
+}
+
+.reveal-line {
+  display: block;
+  white-space: nowrap;
+}
+
+.js .reveal-line {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.js .reveal-line.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.js .scroll-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.js .scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal-line,
+  .js .reveal-line.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .js .scroll-reveal,
+  .js .scroll-reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .red-disc,
+  .bottle-silhouette {
+    transform: none !important;
+    will-change: auto;
+  }
+}
+
+.poster-subhead {
+  grid-area: subhead;
+  align-self: end;
+  max-width: 34ch;
+  font-size: clamp(0.85rem, 2.6cqw, 1.1rem);
+  line-height: 1.5;
+  color: var(--gray-mid);
+  z-index: 1;
+  margin: 0 1rem 1rem 0;
+  width: fit-content;
+  padding: 0.35rem 0.5rem;
+  background-color: var(--warm-white);
+}
+
+.bottle-silhouette {
+  grid-area: bottle;
+  align-self: end;
+  justify-self: end;
+  width: clamp(96px, 20cqw, 170px);
+  margin-top: 0.75rem;
+  max-height: 100%;
+  height: auto;
+  fill: var(--near-black);
+  z-index: 1;
+  will-change: transform;
+}
+
+.fact-rail {
+  grid-area: rail;
+  position: relative;
+  z-index: 1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 2px solid var(--near-black);
+  padding-top: 1rem;
+}
+
+.fact-rail li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.fact-label {
+  font-size: clamp(0.55rem, 1vw, 0.7rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gray-mid);
+}
+
+.fact-value {
+  font-family: var(--font-display);
+  font-size: clamp(0.9rem, 1.7vw, 1.25rem);
+  font-weight: 700;
+  color: var(--near-black);
+}
+
+.fact-rail li:hover .fact-value,
+.fact-rail li:focus-within .fact-value {
+  color: var(--coke-red-dark);
+}
+
+/* Context panel */
+.context-panel {
+  background-color: var(--near-black);
+  color: var(--warm-white);
+  padding: clamp(3rem, 10vw, 7rem) clamp(1.5rem, 4vw, 4rem);
+}
+
+.context-content {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.context-content h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-weight: 700;
+  margin: 0 0 1.5rem;
+  line-height: 1.15;
+}
+
+.context-content p {
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  line-height: 1.65;
+  margin: 0 0 1.25rem;
+  color: rgba(255, 248, 240, 0.9);
+}
+
+/* Footer */
+.site-footer {
+  background-color: var(--warm-white);
+  color: var(--near-black);
+  border-top: 1px solid rgba(10, 10, 10, 0.12);
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.footer-content {
+  max-width: var(--max-poster-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.disclaimer {
+  font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+  line-height: 1.5;
+  margin: 0;
+  color: var(--gray-mid);
+}
+
+.site-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+}
+
+.site-footer a {
+  color: var(--near-black);
+  text-underline-offset: 0.2em;
+}
+
+.site-footer a:hover,
+.site-footer a:focus-visible {
+  color: var(--coke-red-dark);
+  outline: none;
+}
+
+.site-footer a:focus-visible {
+  outline: 2px solid var(--coke-red);
+  outline-offset: 2px;
+}
+
+/* Focus-visible */
+:focus-visible {
+  outline: 2px solid var(--coke-red);
+  outline-offset: 2px;
+}
+
+/* Responsive: tablet */
+@media screen and (max-width: 1023px) {
+  .poster-canvas {
+    width: 100%;
+    aspect-ratio: auto;
+    min-height: 90vh;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto 1fr auto;
+    grid-template-areas:
+      "meta"
+      "headline"
+      "subhead"
+      "bottle"
+      "rail";
+  }
+
+  .poster-headline {
+    font-size: clamp(2.8rem, 12vw, 5.5rem);
+    align-self: start;
+  }
+
+  .poster-subhead {
+    position: static;
+    grid-area: subhead;
+    align-self: start;
+    margin-top: 0.75rem;
+    margin-left: -0.5rem;
+    max-width: 48ch;
+    width: fit-content;
+    padding: 0.35rem 0.5rem;
+    background-color: var(--warm-white);
+  }
+
+  .bottle-silhouette {
+    grid-area: bottle;
+    width: clamp(110px, 18vw, 150px);
+    justify-self: center;
+    align-self: center;
+  }
+
+  .red-disc {
+    width: clamp(180px, 55vw, 380px);
+    height: clamp(180px, 55vw, 380px);
+    top: 4%;
+    left: -10%;
+  }
+
+  .fact-rail {
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+  }
+
+  .fact-rail li {
+    flex: 1 1 40%;
+  }
+}
+
+/* Responsive: mobile */
+@media screen and (max-width: 767px) {
+  .poster-stage {
+    padding: 1rem;
+  }
+
+  .poster-canvas {
+    min-height: auto;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    aspect-ratio: auto;
+    border-width: 1.5px;
+  }
+
+  .poster-meta,
+  .poster-headline,
+  .poster-subhead,
+  .bottle-silhouette,
+  .fact-rail {
+    grid-area: auto;
+  }
+
+  .red-disc {
+    width: 80px;
+    height: 80px;
+    top: 0.25rem;
+    right: 0.5rem;
+    left: auto;
+    transform: none;
+  }
+
+  .poster-headline {
+    align-self: stretch;
+    width: 100%;
+    font-size: clamp(3rem, 12.5vw, 3.25rem);
+    line-height: 1.05;
+    margin-top: 0.5rem;
+  }
+
+  .reveal-line {
+    white-space: normal;
+  }
+
+  .js .reveal-line,
+  .js .reveal-line.is-visible,
+  .js .scroll-reveal,
+  .js .scroll-reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .year-badge {
+    font-size: clamp(1.8rem, 10vw, 2.5rem);
+  }
+
+  .poster-subhead {
+    position: static;
+    font-size: 0.85rem;
+    max-width: none;
+    color: var(--gray-mid);
+    margin: 0;
+  }
+
+  .bottle-silhouette {
+    width: 90px;
+    margin: 0.5rem auto;
+  }
+
+  .fact-rail {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top-width: 1.5px;
+  }
+
+  .fact-rail li {
+    flex: none;
+  }
+
+  .fact-label {
+    font-size: 0.55rem;
+  }
+
+  .fact-value {
+    font-size: 0.85rem;
+  }
+
+  .context-panel {
+    padding: 2.5rem 1.25rem;
+  }
+}
+
+/* Print / poster ratio */
+@page {
+  size: 420mm 594mm;
+  margin: 0;
+}
+
+@media print {
+  html {
+    scroll-behavior: auto;
+  }
+
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    background: var(--warm-white);
+  }
+
+  body {
+    overflow: hidden;
+  }
+
+  body > main {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .skip-link,
+  .context-panel,
+  .site-footer {
+    display: none !important;
+  }
+
+  .poster-stage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 0;
+    break-after: avoid;
+  }
+
+  .poster-canvas {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    aspect-ratio: auto;
+    border: none;
+    break-inside: avoid;
+  }
+
+  .red-disc {
+    transform: none !important;
+  }
+
+  .bottle-silhouette {
+    transform: none !important;
+  }
+
+  .reveal-line {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+}
