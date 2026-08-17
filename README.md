@@ -35,10 +35,10 @@ npm test
 ```
 
 Tests check:
-- Required HTML structure and semantic landmarks.
-- Presence of disclaimer, skip link, and `aria-label` on the bottle SVG.
-- WCAG color contrast on declared palette pairs.
-- No unlicensed or unexpected external assets.
+- Rendered semantic landmarks, keyboard skip navigation, credits, and disclaimer.
+- Responsive containment across desktop, laptop, tablet, and mobile viewports.
+- Computed color contrast across viewports and footer hover states.
+- Actual network requests, local asset responses, motion preferences, and A2 PDF output.
 
 ## Deployment
 
@@ -53,4 +53,4 @@ The site is deployment-neutral static HTML/CSS/JS. Host the repository root on a
 
 ## Disclaimer
 
-This is an independent concept study. It is not affiliated with, endorsed by, or sponsored by The Coca-Cola Company.
+This is an independent, non-commercial, unofficial concept study. It is not affiliated with, endorsed by, or sponsored by The Coca-Cola Company.

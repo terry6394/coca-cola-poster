@@ -13,6 +13,7 @@
 
   --max-poster-width: 1400px;
   --poster-padding: clamp(1.5rem, 4vw, 4rem);
+  --a2-ratio: 1.4142135624;
 }
 
 *, *::before, *::after {
@@ -41,7 +42,6 @@ body {
   background-color: var(--warm-white);
   color: var(--near-black);
   line-height: 1.55;
-  overflow-x: hidden;
 }
 
 /* Skip link */
@@ -73,10 +73,9 @@ body {
 
 .poster-canvas {
   position: relative;
-  width: 100%;
+  width: min(100%, calc((100vh - 2 * var(--poster-padding)) / var(--a2-ratio)));
   max-width: var(--max-poster-width);
-  aspect-ratio: 2 / 3;
-  max-height: calc(100vh - 2 * var(--poster-padding));
+  aspect-ratio: 1 / var(--a2-ratio);
   background-color: var(--warm-white);
   border: 2px solid var(--near-black);
   display: grid;
@@ -88,6 +87,10 @@ body {
     "rail rail";
   padding: clamp(1.5rem, 3vw, 3rem);
   overflow: hidden;
+}
+
+.poster-canvas > * {
+  min-width: 0;
 }
 
 .red-disc {
@@ -109,9 +112,9 @@ body {
   display: flex;
   gap: 0.75rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
-.year-badge,
 .location-badge {
   font-family: var(--font-body);
   font-size: clamp(0.65rem, 1.2vw, 0.8rem);
@@ -123,9 +126,24 @@ body {
 }
 
 .year-badge {
-  background-color: var(--georgia-green);
-  color: var(--warm-white);
-  border-color: var(--georgia-green);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 6vw, 5.5rem);
+  font-weight: 900;
+  line-height: 0.82;
+  letter-spacing: -0.04em;
+  color: var(--near-black);
+}
+
+.year-prefix {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--georgia-green);
 }
 
 .poster-headline {
@@ -154,6 +172,17 @@ body {
   transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
+.js .scroll-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.js .scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal-line {
     opacity: 1;
@@ -161,6 +190,17 @@ body {
   }
   .reveal-line.is-visible {
     transition: none;
+  }
+  .js .scroll-reveal,
+  .js .scroll-reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .red-disc,
+  .bottle-silhouette {
+    transform: none !important;
+    will-change: auto;
   }
 }
 
@@ -173,7 +213,10 @@ body {
   line-height: 1.5;
   color: var(--gray-mid);
   z-index: 1;
-  margin: 0;
+  margin: 0 0 0 -0.5rem;
+  width: fit-content;
+  padding: 0.35rem 0.5rem;
+  background-color: var(--warm-white);
 }
 
 .bottle-silhouette {
@@ -224,7 +267,7 @@ body {
 
 .fact-rail li:hover .fact-value,
 .fact-rail li:focus-within .fact-value {
-  color: var(--coke-red);
+  color: var(--coke-red-dark);
 }
 
 /* Context panel */
@@ -291,7 +334,7 @@ body {
 
 .site-footer a:hover,
 .site-footer a:focus-visible {
-  color: var(--coke-red);
+  color: var(--coke-red-dark);
   outline: none;
 }
 
@@ -306,16 +349,10 @@ body {
   outline-offset: 2px;
 }
 
-/* Responsive: laptop */
-@media (max-width: 1279px) {
-  .poster-canvas {
-    max-height: none;
-  }
-}
-
 /* Responsive: tablet */
 @media (max-width: 1023px) {
   .poster-canvas {
+    width: 100%;
     aspect-ratio: auto;
     min-height: 90vh;
     grid-template-columns: 1fr;
@@ -330,7 +367,7 @@ body {
 
   .poster-headline {
     font-size: clamp(2.8rem, 12vw, 5.5rem);
-    align-self: end;
+    align-self: start;
   }
 
   .poster-subhead {
@@ -338,7 +375,11 @@ body {
     grid-area: subhead;
     align-self: start;
     margin-top: 0.75rem;
+    margin-left: -0.5rem;
     max-width: 48ch;
+    width: fit-content;
+    padding: 0.35rem 0.5rem;
+    background-color: var(--warm-white);
   }
 
   .bottle-silhouette {
@@ -398,9 +439,15 @@ body {
   }
 
   .poster-headline {
-    font-size: clamp(1.4rem, 7vw, 1.8rem);
+    align-self: stretch;
+    width: 100%;
+    font-size: clamp(2.6rem, 12.5vw, 3rem);
     line-height: 1.05;
     margin-top: 0.5rem;
+  }
+
+  .year-badge {
+    font-size: clamp(1.8rem, 10vw, 2.5rem);
   }
 
   .poster-subhead {
@@ -442,28 +489,58 @@ body {
 }
 
 /* Print / poster ratio */
+@page {
+  size: 420mm 594mm;
+  margin: 0;
+}
+
 @media print {
   html {
     scroll-behavior: auto;
   }
 
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    background: var(--warm-white);
+  }
+
+  body {
+    overflow: hidden;
+  }
+
+  body > main {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
   .skip-link,
-  .site-footer nav {
-    display: none;
+  .context-panel,
+  .site-footer {
+    display: none !important;
   }
 
   .poster-stage {
-    min-height: auto;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
     padding: 0;
-    page-break-after: always;
+    break-after: avoid;
   }
 
   .poster-canvas {
-    max-height: none;
     width: 100%;
-    aspect-ratio: 2 / 3;
+    height: 100%;
+    max-width: none;
+    aspect-ratio: auto;
     border: none;
-    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   .red-disc {
@@ -479,7 +556,4 @@ body {
     transform: none !important;
   }
 
-  .context-panel {
-    page-break-before: always;
-  }
 }

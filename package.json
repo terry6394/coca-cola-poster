@@ -4,7 +4,7 @@
   "description": "Independent Heritage Poster concept inspired by Coca-Cola history",
   "private": true,
   "scripts": {
-    "test": "node --test tests/*.test.js",
+    "test": "node --test tests/browser.test.js",
     "start": "python3 -m http.server 8000"
   },
   "devDependencies": {},
