@@ -365,6 +365,11 @@ describe('Rendered semantic structure', () => {
   it('supports keyboard access through the skip link', async () => {
     await page.goto(app.url);
     await page.evaluate('document.activeElement.blur(); window.scrollTo(0, 0)');
+    const hiddenSkipLink = await page.evaluate(`(() => {
+      const rect = document.querySelector('.skip-link').getBoundingClientRect();
+      return { bottom: rect.bottom, top: rect.top };
+    })()`);
+    assert.ok(hiddenSkipLink.bottom <= -1, `unfocused skip link remains visible at ${hiddenSkipLink.bottom}px`);
     await page.send('Input.dispatchKeyEvent', { code: 'Tab', key: 'Tab', type: 'keyDown', windowsVirtualKeyCode: 9 });
     await page.send('Input.dispatchKeyEvent', { code: 'Tab', key: 'Tab', type: 'keyUp', windowsVirtualKeyCode: 9 });
     await page.wait(250);
@@ -433,8 +438,10 @@ describe('Responsive layout and rendered contrast', () => {
   const viewports = [
     ['desktop', 1920, 1080],
     ['laptop', 1280, 800],
+    ['short-laptop', 1280, 600],
     ['tablet', 768, 1024],
     ['mobile', 375, 667],
+    ['narrow-mobile', 320, 568],
   ];
 
   for (const [name, width, height] of viewports) {
@@ -465,6 +472,8 @@ describe('Responsive layout and rendered contrast', () => {
           canvas: { bottom: canvas.bottom, left: canvas.left, right: canvas.right, top: canvas.top, ratio: canvas.height / canvas.width },
           children,
           ink,
+          headline: rectFor('.poster-headline'),
+          headlineFontSize: parseFloat(getComputedStyle(document.querySelector('.poster-headline')).fontSize),
           innerWidth,
           rail: rectFor('.fact-rail'),
           meta: rectFor('.poster-meta'),
@@ -487,6 +496,8 @@ describe('Responsive layout and rendered contrast', () => {
         assert.ok(line.right <= layout.canvas.right + 1, `${line.text} ink clips on the right at ${name}`);
         assert.ok(line.top >= layout.canvas.top - 1, `${line.text} ink clips above the canvas at ${name}`);
         assert.ok(line.bottom <= layout.canvas.bottom + 1, `${line.text} ink clips below the canvas at ${name}`);
+        assert.ok(line.left >= layout.headline.left - 1, `${line.text} ink overflows the headline on the left at ${name}`);
+        assert.ok(line.right <= layout.headline.right + 1, `${line.text} ink overflows the headline on the right at ${name}`);
       });
       const overlapArea = (first, second) => Math.max(0, Math.min(first.right, second.right) - Math.max(first.left, second.left))
         * Math.max(0, Math.min(first.bottom, second.bottom) - Math.max(first.top, second.top));
@@ -497,10 +508,13 @@ describe('Responsive layout and rendered contrast', () => {
       layout.ink.forEach((line) => {
         assert.equal(overlapArea(layout.bottle, line), 0, `bottle covers ${line.text} at ${name}`);
       });
-      if (name === 'desktop' || name === 'laptop') {
+      if (name === 'desktop' || name.includes('laptop')) {
         assert.ok(Math.abs(layout.canvas.ratio - Math.SQRT2) < 0.01, `${name} poster is not A-series ratio`);
       }
-      if (process.env.UPDATE_SCREENSHOTS === '1') {
+      if (name.includes('mobile')) {
+        assert.ok(layout.headlineFontSize >= 48, `mobile headline is ${layout.headlineFontSize}px instead of at least 48px`);
+      }
+      if (process.env.UPDATE_SCREENSHOTS === '1' && ['desktop', 'laptop', 'tablet', 'mobile'].includes(name)) {
         await page.screenshot(path.join(rootDir, 'tests', 'screenshots', `${name}.png`));
       }
     });
@@ -512,6 +526,7 @@ describe('Responsive layout and rendered contrast', () => {
       const checks = [
         ['.poster-headline', 3],
         ['.year-badge', 3],
+        ['.year-prefix', 4.5],
         ['.poster-subhead', 4.5],
         ['.fact-label', 4.5],
         ['.context-content p', 4.5],

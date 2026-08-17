@@ -60,7 +60,7 @@
     if (rect.bottom > 0 && rect.top < viewportHeight) {
       const progress = Math.max(0, Math.min(1, 1 - (rect.bottom / (viewportHeight + rect.height))));
       const discOffset = progress * 30;
-      const bottleOffset = progress * -40;
+      const bottleOffset = progress * -10;
 
       redDisc.style.transform = `translateY(${discOffset}px) scale(${1 + progress * 0.03})`;
       bottle.style.transform = `translateY(${bottleOffset}px)`;

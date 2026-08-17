@@ -12,7 +12,7 @@
   --font-body: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   --max-poster-width: 1400px;
-  --poster-padding: clamp(1.5rem, 4vw, 4rem);
+  --poster-padding: clamp(1.5rem, 4vh, 4rem);
   --a2-ratio: 1.4142135624;
 }
 
@@ -47,18 +47,19 @@ body {
 /* Skip link */
 .skip-link {
   position: absolute;
-  top: -40px;
+  top: 0;
   left: 0;
   background: var(--near-black);
   color: var(--warm-white);
   padding: 0.5rem 1rem;
   text-decoration: underline;
   z-index: 100;
-  transition: top 0.2s;
+  transform: translateY(calc(-100% - 2px));
+  transition: transform 0.2s;
 }
 
 .skip-link:focus {
-  top: 0;
+  transform: translateY(0);
 }
 
 /* Poster stage */
@@ -72,7 +73,7 @@ body {
 }
 
 .poster-canvas {
-  --poster-gutter: clamp(1.5rem, 7cqw, 3rem);
+  --poster-gutter: clamp(1.5rem, 4vh, 3rem);
   position: relative;
   width: min(100%, calc((100vh - 2 * var(--poster-padding)) / var(--a2-ratio)));
   max-width: var(--max-poster-width);
@@ -147,6 +148,8 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--georgia-green);
+  padding: 0.15rem 0.25rem;
+  background-color: var(--warm-white);
 }
 
 .poster-headline {
@@ -156,7 +159,6 @@ body {
   align-self: center;
   font-family: var(--font-display);
   width: 100%;
-  padding-right: 24cqw;
   font-size: clamp(3rem, 10.5cqw, 6rem);
   font-weight: 900;
   line-height: 0.92;
@@ -231,6 +233,7 @@ body {
   align-self: end;
   justify-self: end;
   width: clamp(96px, 20cqw, 170px);
+  margin-top: 0.75rem;
   max-height: 100%;
   height: auto;
   fill: var(--near-black);
@@ -450,9 +453,13 @@ body {
   .poster-headline {
     align-self: stretch;
     width: 100%;
-    font-size: clamp(2.6rem, 12.5vw, 3rem);
+    font-size: clamp(3rem, 12.5vw, 3.25rem);
     line-height: 1.05;
     margin-top: 0.5rem;
+  }
+
+  .reveal-line {
+    white-space: normal;
   }
 
   .js .reveal-line,
